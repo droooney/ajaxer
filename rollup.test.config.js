@@ -40,18 +40,7 @@ module.exports = {
     }),
     babel({
       include: './**/*.js',
-      exclude: 'node_modules/**',
-      presets: [
-        [
-          'es2015',
-          {
-            modules: false
-          }
-        ]
-      ],
-      plugins: [
-        'external-helpers'
-      ]
+      exclude: 'node_modules/**'
     }),
     inject({
       exclude: './lib/constants/global.js',

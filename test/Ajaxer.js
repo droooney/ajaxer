@@ -3,10 +3,13 @@ import {
   notEqual,
   strictEqual
 } from 'assert';
+import Promise from 'el-promise';
 import Ajaxer from '../lib/Ajaxer';
 
 const { random } = Math;
 const origin = '/ajaxer';
+
+Ajaxer.usePromise(Promise);
 
 describe('it should test Ajaxer#', () => {
   describe('after()', () => {
@@ -340,7 +343,7 @@ describe('it should test Ajaxer#', () => {
         username: '',
         password: ''
       });
-      strictEqual(config.baseURL, global.location.origin);
+      strictEqual(config.baseURL, window.location.origin);
       deepStrictEqual(config.headers, {});
       deepStrictEqual(config.params, {});
       deepStrictEqual(config.query, {});

@@ -5,7 +5,7 @@ const babel = require('rollup-plugin-babel');
 const inject = require('rollup-plugin-inject');
 
 module.exports = {
-  entry: './lib/Ajaxer.js',
+  entry: './entry.js',
   dest: './bundle.js',
   format: 'iife',
   moduleName: 'Ajaxer',
