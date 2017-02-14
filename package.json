@@ -1,6 +1,6 @@
 {
   "name": "ajaxer",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "lib/Ajaxer.js",
   "devDependencies": {
     "babel-core": "^6.22.1",
