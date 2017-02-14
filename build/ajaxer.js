@@ -508,10 +508,6 @@ var Ajaxer = function (_Function) {
 
     var conf = deepAssign({}, defaults$$1, config);
 
-    if (conf.before.indexOf(fetchBeforeMiddleware) === -1) {
-      conf.before.push(fetchBeforeMiddleware);
-    }
-
     /**
      * @member {AjaxerConfig} Ajaxer#$$
      * @type {AjaxerConfig}
@@ -619,7 +615,7 @@ var Ajaxer = function (_Function) {
      * @example
      * const ajaxer = new Ajaxer();
      *
-     * ajaxer.config({ baseURL: 5000 });
+     * ajaxer.config({ timeout: 5000 });
      * ajaxer.config().timeout; // 5000
      *
      * ajaxer.config((config) => {
@@ -955,19 +951,25 @@ var Ajaxer = function (_Function) {
               _conf$auth = conf.auth,
               username = _conf$auth.username,
               password = _conf$auth.password,
+              baseURL = conf.baseURL,
               data = conf.data,
               headers = conf.headers,
               method = conf.method,
               onprogress = conf.onprogress,
+              params = conf.params,
+              query = conf.query,
               responseType = conf.responseType,
               timeout = conf.timeout,
               url = conf.url,
               withCredentials = conf.withCredentials;
 
+          var eventualMethod = method.toUpperCase();
+          var eventualURL = constructURL(baseURL, url, params, query);
+          var eventualData = transformData(data, eventualMethod, headers);
 
           xhr = new XMLHttpRequest();
 
-          xhr.open(method, url, true, username, password);
+          xhr.open(eventualMethod, eventualURL, true, username, password);
 
           iterate(headers, function (value, header) {
             xhr.setRequestHeader(header, value);
@@ -1064,7 +1066,7 @@ var Ajaxer = function (_Function) {
           xhr.timeout = +timeout || 0;
           xhr.withCredentials = !!withCredentials;
 
-          xhr.send(data);
+          xhr.send(eventualData);
         });
       });
 
@@ -1082,31 +1084,18 @@ var Ajaxer = function (_Function) {
   return Ajaxer;
 }(Function);
 
-function fetchBeforeMiddleware(config) {
-  var baseURL = config.baseURL,
-      data = config.data,
-      headers = config.headers,
-      method = config.method,
-      params = config.params,
-      query = config.query,
-      url = config.url;
-
-  var METHOD = method.toUpperCase();
-
-  config.method = METHOD;
-  config.url = constructURL(baseURL, url, params, query);
-  config.data = transformData(data, METHOD, headers);
-}
-
 /**
- * @const {Ajaxer} fetch
+ * @const {Ajaxer} ajaxer
  * @type {Ajaxer}
  * @public
  * @description Empty instance of Ajaxer.
  */
-var fetch = new Ajaxer();
+
+
+var ajaxer = new Ajaxer();
 
 window.Ajaxer = Ajaxer;
+window.ajaxer = ajaxer;
 
 }());
 //# sourceMappingURL=ajaxer.js.map

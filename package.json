@@ -1,6 +1,6 @@
 {
   "name": "ajaxer",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "main": "lib/Ajaxer.js",
   "devDependencies": {
     "babel-core": "^6.22.1",
@@ -28,5 +28,11 @@
     "rollup-watch": "^3.2.2",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0"
-  }
+  },
+  "keywords": [
+    "ajax",
+    "promise",
+    "fetch",
+    "browser"
+  ]
 }

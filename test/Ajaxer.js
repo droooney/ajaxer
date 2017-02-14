@@ -35,11 +35,11 @@ describe('it should test Ajaxer#', () => {
 
       ajaxer.before(middleware1);
 
-      deepStrictEqual(ajaxer.$$.before.slice(0, -1), [middleware1]);
+      deepStrictEqual(ajaxer.$$.before, [middleware1]);
 
       ajaxer.before(middleware2);
 
-      deepStrictEqual(ajaxer.$$.before.slice(0, -1), [middleware2, middleware1]);
+      deepStrictEqual(ajaxer.$$.before, [middleware2, middleware1]);
     });
   });
   describe('config()', () => {
@@ -754,21 +754,11 @@ describe('it should test Ajaxer#', () => {
     it('should construct url the right way', (done) => {
       const ajaxer = new Ajaxer({
         baseURL: origin,
+        responseType: 'json',
         url: '/foo/bar/:baz/:baz/:foo/:bar?foo=bar'
       });
 
       ajaxer
-        .before((req) => {
-          strictEqual(
-            req.url,
-            `
-              /ajaxer/foo/bar/foo/foo/bar/baz?foo=bar&a=2&b%5B%5D=s&b%5B%5D=2&c%5Bd%5D=t&
-              c%5Be%5D%5Bf%5D=3&c%5Be%5D%5Bg%5D%5B%5D=5&c%5Be%5D%5Bg%5D%5B%5D%5Bh%5D=1&
-              c%5Be%5D%5Bg%5D%5B%5D%5Bi%5D%5B%5D=2&c%5Be%5D%5Bg%5D%5B%5D%5Bi%5D%5B%5D%5B%5D=9&
-              c%5Be%5D%5Bg%5D%5B%5D%5Bi%5D%5B%5D%5B%5D=p
-            `.replace(/\s+/g, '')
-          );
-        }, false)
         .request({
           params: {
             foo: 'bar',
@@ -796,24 +786,38 @@ describe('it should test Ajaxer#', () => {
             }
           }
         })
-        .then(() => done())
+        .then(({ data }) => {
+          strictEqual(
+            data.url,
+            `
+              /ajaxer/foo/bar/foo/foo/bar/baz?foo=bar&a=2&b%5B%5D=s&b%5B%5D=2&c%5Bd%5D=t&
+              c%5Be%5D%5Bf%5D=3&c%5Be%5D%5Bg%5D%5B%5D=5&c%5Be%5D%5Bg%5D%5B%5D%5Bh%5D=1&
+              c%5Be%5D%5Bg%5D%5B%5D%5Bi%5D%5B%5D=2&c%5Be%5D%5Bg%5D%5B%5D%5Bi%5D%5B%5D%5B%5D=9&
+              c%5Be%5D%5Bg%5D%5B%5D%5Bi%5D%5B%5D%5B%5D=p
+            `.replace(/\s+/g, '')
+          );
+
+          done();
+        })
         .catch(done);
     });
     it('should test data transformation', (done) => {
-      const data = {
-        a: 1
-      };
-      const json = JSON.stringify(data);
+      const rand = random().toString(36);
+      const originalData = { rand };
       const ajaxer = new Ajaxer({
-        baseURL: origin
+        baseURL: origin,
+        responseType: 'json'
       });
 
       ajaxer
-        .before((req) => {
-          strictEqual(req.data, json);
-        }, false)
-        .post('/transformData', data)
-        .then(() => done())
+        .post('/transformData', originalData, {
+          responseType: 'json'
+        })
+        .then(({ data }) => {
+          deepStrictEqual(data.body, originalData);
+
+          done();
+        })
         .catch(done);
     });
     it('should test request itself', (done) => {
@@ -834,10 +838,10 @@ describe('it should test Ajaxer#', () => {
     it('should test timeout', (done) => {
       const ajaxer = new Ajaxer({
         baseURL: origin,
-        timeout: 100
+        timeout: 200
       });
 
-      ajaxer('/timeout/100')
+      ajaxer('/timeout/500')
         .then(done)
         .catch((err) => {
           strictEqual(err.type, 'TIMEOUT_ERROR');
